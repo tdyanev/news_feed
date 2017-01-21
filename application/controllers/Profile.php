@@ -3,14 +3,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Profile extends CI_Controller {
 
-    private $params = [];
-
     public function __construct() {
         parent::__construct();
         if (!$this->session->has_userdata('email')) {
             $this->_redirect();
         }
 
+        $this->load->model('source_model');
         //$this->lang->load('welcome', 'english');
     }
     /**
@@ -28,22 +27,37 @@ class Profile extends CI_Controller {
      * map to /index.php/welcome/<method_name>
      * @see https://codeigniter.com/user_guide/general/urls.html
      */
-    public function index()
-    {
-
-        $this->_render();
-    }
-
-    public function read($url) {
-
-        //some external lib that parse $url
-
-    }
-
-    private function _render() {
+    public function index() {
         $this->load->view('base', [
-            'content' => $this->load->view('profile', $this->params, true),
+            'content' => $this->load->view('profile', [], true),
         ]);
+    }
+
+    public function get_box_view() {
+        $this->load->view('box', [
+            'sources' => $this->source_model->get_all(),
+        ]);
+    }
+
+    public function read() {
+        $url = $this->input->post('url');
+
+        //$url = 'https://www.vesti.bg/rss.php';
+
+        if (!$url) {
+            return NULL;
+        }
+
+        $this->load->view('item', [
+            'xml' => $this->_read($url)
+        ]);
+    }
+
+    private function _read($url) {
+        //some logic
+        $xml = simplexml_load_file($url, null, LIBXML_NOCDATA);
+
+        return $xml->channel;
     }
 
     private function _redirect() {

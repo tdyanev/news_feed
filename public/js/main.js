@@ -1,23 +1,91 @@
-$(function() {
+(function() {
   var $main   = $('#main');
-  var SIZE    = 12;
-  var $newBox = $('#new-box');
 
+  var $newBox = $('#new-box');
+  var $range = $('#range');
+  var size;
+
+  function App(baseURL, size) {
+    var boxSelector = '.box';
+
+    size = size || 3;
+
+    $newBox.on('click', function() {
+      generateBox();
+
+      return false;
+    });
+
+    $range.on('input', function() {
+      var value = parseInt(this.value, 10);
+
+      changeSize(value);
+    });
+
+
+    function generateBox() {
+      $.ajax({
+        dataType: 'html',
+        url: baseURL + 'profile/get_box_view',
+        success: function(html) {
+          var $el;
+
+          $main.append(html)
+            .sortable();
+
+          setupBox($main.find(boxSelector).last());
+        },
+      });
+    }
+
+    function setupBox($el) {
+      $el.addClass('col-md-' + size);
+
+      $el.find('select').first().on('change', function() {
+        $.ajax({
+          dataType: 'html',
+          method: 'post',
+          url: baseURL + 'profile/read',
+          data: {
+            url: this.value
+          },
+          success: function(html) {
+            $el.find('.setup').hide();
+            $el.find('.content').html(html);
+          }
+        })
+
+      });
+    }
+
+    function populate($el, data) {
+      console.log(arguments);
+    }
+
+    function changeSize(newSize) {
+      $main.find(boxSelector)
+        .removeClass('col-md-' + size)
+        .addClass('col-md-' + newSize)
+
+      size = newSize;
+    }
+
+
+  }
   /*
   function createGrid(rows, cols) {
     var html = '';
     var s = parseInt(SIZE / cols, 10);
-    var el = '<div class="box col-xs-' + s + '"></div>';
+    var el = '<div class="box col-md-' + s + '"></div>';
     var len = rows * cols;
     var i;
 
     for (i = 0; i < len; i++) {
       html += el;
     };
-  
+
     $main.html(html);
   }
-  */
 
   function watchNumbers() {
     var $rows = $('#rows');
@@ -42,7 +110,7 @@ $(function() {
 
   $newBox.on('click', function() {
     var $box = generateBox();
-  
+
   });
 
   function generateBox() {
@@ -58,7 +126,6 @@ $(function() {
       //containment: '#main',
     });
     */
-  }
 
-
-});
+  window.App = App;
+}());
