@@ -1,16 +1,17 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Welcome extends CI_Controller {
+class Profile extends CI_Controller {
+
+    private $params = [];
 
     public function __construct() {
         parent::__construct();
-
-        if ($this->session->has_userdata('email')) {
-            redirect('profile');
+        if (!$this->session->has_userdata('email')) {
+            $this->_redirect();
         }
 
-        $this->lang->load('welcome');
+        //$this->lang->load('welcome', 'english');
     }
     /**
      * Index Page for this controller.
@@ -29,10 +30,28 @@ class Welcome extends CI_Controller {
      */
     public function index()
     {
-        $this->load->view('base', [
-            'content' => $this->load->view('welcome', [], true),
-            'title'   => $this->lang->line('welcome'),
-        ]);
 
+        $this->_render();
+    }
+
+    public function read($url) {
+
+        //some external lib that parse $url
+
+    }
+
+    private function _render() {
+        $this->load->view('base', [
+            'content' => $this->load->view('profile', $this->params, true),
+        ]);
+    }
+
+    private function _redirect() {
+        redirect('login');
+    }
+
+    public function logout() {
+        $this->session->unset_userdata('email');
+        $this->_redirect();
     }
 }
