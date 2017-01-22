@@ -19,6 +19,7 @@
               <input type="password" name="login-password" class="form-control" id="login-password" placeholder="Password">
             </div>
           </div>
+<!--
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-5">
               <div class="checkbox">
@@ -28,6 +29,7 @@
               </div>
             </div>
           </div>
+-->
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-5">
               <button type="submit" class="btn btn-default">Sign in</button>

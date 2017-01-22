@@ -1,29 +1,128 @@
 (function() {
   var $main   = $('#main');
-
+  var $save   = $('#save');
   var $newBox = $('#new-box');
   var $range = $('#range');
-  var size;
+  var $flash = $('#flash');
+  var size = 3;
 
-  function App(baseURL, size) {
+  function parallel(fns, done) {
+    var len = fns.length;
+    var left = len;
+    var i;
+
+    function iterDown() {
+      if (--left <= 0) {
+        done();
+      }
+    }
+
+    for (i = 0; i < len; i++) {
+      fns[i](iterDown);
+    }
+
+  }
+
+  function App(baseURL, savedStatus) {
     var boxSelector = '.box';
 
-    size = size || 3;
+    if (!!savedStatus) {
+      restoreSettings(savedStatus, setup);
+    } else {
+      setup();
+    }
 
-    $newBox.on('click', function() {
-      generateBox();
+    function restoreSettings(savedStatus, done) {
+      var data = JSON.parse(savedStatus);
 
-      return false;
-    });
+      function prepareBlocks() {
+        var len = data.ids.length;
+        var fns = [];
+        var i;
 
-    $range.on('input', function() {
-      var value = parseInt(this.value, 10);
+        for (i = 0; i < len; i++) {
+          fns[i] = function(done) {
+            generateBox(done);
+          };
+        }
 
-      changeSize(value);
-    });
+        return fns;
+      }
+
+      function prepareSources() {
+        var $boxes = $(boxSelector);
+        var len = data.ids.length;
+        var fns = [];
+        var j = 0;
+        var i;
+
+        for (i = 0; i < len; i++) {
+          console.log(i);
+          fns[i] = function(done) {
+            loadSource($boxes.eq(j), data.ids[j], done);
+            j++;
+          };
+        }
+
+        return fns;
+      }
+
+      $range.val(data.size);
+      setSize(data.size);
+
+      parallel(prepareBlocks(), function() {
+        parallel(prepareSources(), done);
+      });
 
 
-    function generateBox() {
+    }
+
+    function setup() {
+      $newBox.on('click', function() {
+        generateBox();
+
+        return false;
+      });
+
+      $save.on('click', function() {
+        var $boxes = $(boxSelector);
+        var settings = {
+          size : size,
+          ids  : [],
+        };
+
+        $boxes.each(function(i, box) {
+          var id = parseInt($(box).data('source_id'));
+
+          if (id) {
+            settings.ids.push(id);
+          }
+        });
+
+        $.ajax({
+          dataType: 'html',
+          method: 'post',
+          url: baseURL + 'profile/save',
+          data: {
+            settings: JSON.stringify(settings),
+          },
+          success: function(html) {
+            $flash.hide().fadeIn('slow').html(html);
+          }
+        });
+      });
+
+
+      $range.on('input', function() {
+        var value = parseInt(this.value, 10);
+
+        setSize(value);
+      });
+
+    }
+
+
+    function generateBox(done) {
       $.ajax({
         dataType: 'html',
         url: baseURL + 'profile/get_box_view',
@@ -34,6 +133,7 @@
             .sortable();
 
           setupBox($main.find(boxSelector).last());
+          (done || function() {})();
         },
       });
     }
@@ -42,27 +142,52 @@
       $el.addClass('col-md-' + size);
 
       $el.find('select').first().on('change', function() {
-        $.ajax({
-          dataType: 'html',
-          method: 'post',
-          url: baseURL + 'profile/read',
-          data: {
-            url: this.value
-          },
-          success: function(html) {
-            $el.find('.setup').hide();
-            $el.find('.content').html(html);
-          }
-        })
-
+        loadSource($el, this.value);
       });
+    }
+
+    function loadSource($el, value, done) {
+      var $loading = $el.find('.loading').first();
+
+      $el.find('.setup').hide();
+      $loading.show();
+
+      $.ajax({
+        dataType: 'html',
+        method: 'post',
+        url: baseURL + 'profile/read',
+        data: {
+          id: value
+        },
+        success: function(html) {
+          //setTimeout(function() {
+          $loading.hide();
+          $el.find('.content').html(html);
+          $el.data('source_id', value);
+
+          $el.find('.reload').click(function() {
+            loadSource($el, value);
+
+            return false;
+          });
+
+          $el.find('.dismiss .close').click(function() {
+            $el.remove();
+          });
+
+          (done || function() {})();
+
+          //}, 2000);
+        }
+      });
+
     }
 
     function populate($el, data) {
       console.log(arguments);
     }
 
-    function changeSize(newSize) {
+    function setSize(newSize) {
       $main.find(boxSelector)
         .removeClass('col-md-' + size)
         .addClass('col-md-' + newSize)

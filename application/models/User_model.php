@@ -31,6 +31,19 @@ class User_model extends CI_Model {
         return $this->db->insert($this->table, $data);
     }
 
+    public function get($email) {
+        return $this->db->where('email', $email)
+            ->get($this->table)
+            ->row();
+    }
+
+    public function update($email, $data) {
+        $this->db->where('email', $email);
+        $this->db->update($this->table, $data);
+
+        return $this->db->affected_rows();
+    }
+
     private function _encode($data) {
         $options = [
             'cost' => 12,

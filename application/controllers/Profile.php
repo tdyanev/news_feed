@@ -3,6 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Profile extends CI_Controller {
 
+    private $email;
+
     public function __construct() {
         parent::__construct();
         if (!$this->session->has_userdata('email')) {
@@ -10,6 +12,9 @@ class Profile extends CI_Controller {
         }
 
         $this->load->model('source_model');
+        $this->load->model('user_model');
+
+        $this->email = $this->session->userdata('email');
         //$this->lang->load('welcome', 'english');
     }
     /**
@@ -29,7 +34,10 @@ class Profile extends CI_Controller {
      */
     public function index() {
         $this->load->view('base', [
-            'content' => $this->load->view('profile', [], true),
+            'content' => $this->load->view('profile', [
+                'title' => null,
+                'user'  => $this->user_model->get($this->email),
+            ], true),
         ]);
     }
 
@@ -39,8 +47,18 @@ class Profile extends CI_Controller {
         ]);
     }
 
+    public function save() {
+        $result = $this->user_model->update($this->email, [
+            'settings' => $this->input->post('settings'),
+        ]);
+
+        $view = $result > 0 ? 'save/success' : 'save/fail';
+        $this->load->view($view);
+    }
+
     public function read() {
-        $url = $this->input->post('url');
+        $id = $this->input->post('id');
+        $url = $this->source_model->get_source($id);
 
         //$url = 'https://www.vesti.bg/rss.php';
 
