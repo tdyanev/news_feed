@@ -7,12 +7,14 @@ This project lets you create your own news portal.
 * PHP 7.0+
 * `composer` command (See [Composer Installation](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx))
 * Git
+* bower
 
 ## How to Use
 
 ### Install 
 ```
 $ composer install
+$ bower install
 ```
 
 ### Run PHP built-in server
