@@ -4,7 +4,7 @@ This project lets you create your own news portal.
 
 ## Requirements
 
-* PHP 5.3.7 or later
+* PHP 5.4
 * `composer` command (See [Composer Installation](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx))
 * Git
 
@@ -15,7 +15,7 @@ This project lets you create your own news portal.
 $ composer install
 ```
 
-### Run PHP built-in server (PHP 5.4 or later)
+### Run PHP built-in server
 
 ```
 $ bin/server.sh
