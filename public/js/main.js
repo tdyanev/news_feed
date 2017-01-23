@@ -171,7 +171,7 @@
             return false;
           });
 
-          $el.find('.dismiss .close').click(function() {
+          $el.find('.close').click(function() {
             $el.remove();
           });
 

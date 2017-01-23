@@ -1,18 +1,16 @@
+<div class="tools row">
+    <div class="col-xs-2">
+        <a href="#" class="reload"><img src="<?=base_url();?>img/refresh.png" height="15" alt="reload" /></a>
+    </div>
+
+    <div class="col-xs-2 col-xs-offset-8">
+        <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div>
+</div>
+
 <div class="row">
-<div class="col-xs-2">
-<a href="#" class="reload"><img src="<?=base_url();?>img/refresh.png" height="15" alt="reload" /></a>
-</div>
 
-<div class="col-xs-8">
-
-<h2 class="source-title"><?=$xml->title;?></h2>
-
-</div>
-
-<div class="col-xs-2 pull-right dismiss">
-<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-</div>
-
+    <h2 class="source-title"><?=$xml->title;?></h2>
 
 </div>
 

@@ -20,7 +20,7 @@
 
 
 <div class="container-fluid">
-    <div class="row" id="flash"></div>
+    <div class="container" id="flash"></div>
     <div class="row" id="main"></div>
 </div>
 
